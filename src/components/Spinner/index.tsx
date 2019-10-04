@@ -1,80 +1,75 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 
-import { gray200, gray600 } from '../../core/Colors';
+import { gray200, gray400 } from '../../core/Colors';
 
-interface SpinnerProps {
-  size?: number;
-  backgroundColor?: string;
-  color?: string;
+export interface SpinnerProps {
+  size: number;
+  color: string;
+  backgroundColor: string;
 }
 
-const SPINNER_TRACK = 'M 50,50 m 0,-44.5 a 44.5,44.5 0 1 1 0,89 a 44.5,44.5 0 1 1 0,-89';
-const PATH_LENGTH = 280;
-const STROKE_WIDTH = 4;
+export class Spinner extends PureComponent<SpinnerProps> {
+  public static defaultProps: Partial<SpinnerProps> = {
+    color: gray400,
+    size: 64,
+    backgroundColor: gray200,
+  };
 
-const strokeWidth = (STROKE_WIDTH * 100) / 50;
-const strokeOffset = PATH_LENGTH - PATH_LENGTH * 0.25;
-
-const SpinnerHead = styled.path<SpinnerProps>`
-  transform-origin: center;
-  transition: stroke-dashoffset 2s cubic-bezier(0.4, 1, 0.75, 0.9);
-  stroke: ${props => props.backgroundColor || gray600};
-  stroke-linecap: round;
-`;
-
-const SpinnerTrack = styled.path`
-  stroke: ${props => props.color || gray200};
-`;
-
-const SpinnerContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: visible;
-  vertical-align: middle;
-
-  svg {
-    display: block;
+  public render() {
+    return (
+      <PureCssContainer {...this.props}>
+        <div />
+        <div />
+        <div />
+        <div />
+        <div />
+        <div />
+      </PureCssContainer>
+    );
   }
+}
 
-  path {
-    fill-opacity: 0;
-  }
-`;
-
-const SpinnerAnimation = styled.span`
-  @keyframes pt-spinner-animation {
-    from {
+const PureCssContainer = styled.div<SpinnerProps>`
+  @keyframes lds-ring {
+    0% {
       transform: rotate(0deg);
     }
-    to {
+    100% {
       transform: rotate(360deg);
     }
   }
-  animation: pt-spinner-animation 0.62s ease-in-out infinite;
-`;
-
-const Container = styled.div`
   display: inline-block;
+  position: relative;
+  width: ${({ size }) => `${size}px`};
+  height: ${({ size }) => `${size}px`};
+  div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: ${({ size }) => `${size - 13}px`};
+    height: ${({ size }) => `${size - 13}px`};
+    border: 6px solid ${({ color }) => color};
+    margin: 6px;
+    border-radius: 50%;
+  }
+  div:not(:first-child) {
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: ${({ color }) => color} transparent transparent transparent;
+  }
+  div:first-child {
+    border-color: ${({ backgroundColor }) => backgroundColor};
+  }
+  div:nth-child(2) {
+    animation-delay: -0.6s;
+  }
+  div:nth-child(3) {
+    animation-delay: -0.45s;
+  }
+  div:nth-child(4) {
+    animation-delay: -0.3s;
+  }
+  div:nth-child(5) {
+    animation-delay: -0.15s;
+  }
 `;
-
-export const Spinner = ({ size = 50, backgroundColor, color, ...restProps }: SpinnerProps) => (
-  <Container {...restProps}>
-    <SpinnerContainer>
-      <SpinnerAnimation>
-        <svg height={size} width={size} viewBox="0 0 100 100" strokeWidth={strokeWidth}>
-          <SpinnerTrack color={color} d={SPINNER_TRACK} />
-          <SpinnerHead
-            backgroundColor={backgroundColor}
-            d={SPINNER_TRACK}
-            pathLength={PATH_LENGTH}
-            strokeDasharray={`${PATH_LENGTH} ${PATH_LENGTH}`}
-            strokeDashoffset={strokeOffset}
-          />
-        </svg>
-      </SpinnerAnimation>
-    </SpinnerContainer>
-  </Container>
-);
